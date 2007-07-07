@@ -28,5 +28,5 @@
   Player System
    Make a character that spawns in the map
    Give the player an inventory
-   
-  
+
+...and more, but lets not get ahead of ourselves. hah.
