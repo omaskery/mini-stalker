@@ -75,6 +75,7 @@ public:
 		}
 
 		keys = SDL_GetKeyState(NULL);
+		SDL_WM_SetCaption(window_title.c_str(),window_title.c_str());
 	}
 	int PollEvent(SDL_Event *e)
 	{
