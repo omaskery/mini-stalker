@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual C++ Express 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mini_STALKER", "Mini_STALKER\Mini_STALKER.vcproj", "{BB6746FE-ED44-47EA-966B-5E697F82B8CA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Map_Editor", "Map Editor\Map Editor.vcproj", "{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{BB6746FE-ED44-47EA-966B-5E697F82B8CA}.Debug|Win32.Build.0 = Debug|Win32
 		{BB6746FE-ED44-47EA-966B-5E697F82B8CA}.Release|Win32.ActiveCfg = Release|Win32
 		{BB6746FE-ED44-47EA-966B-5E697F82B8CA}.Release|Win32.Build.0 = Release|Win32
+		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Debug|Win32.Build.0 = Debug|Win32
+		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Release|Win32.ActiveCfg = Release|Win32
+		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
