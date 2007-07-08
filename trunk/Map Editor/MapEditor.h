@@ -35,7 +35,7 @@ struct map
 
 	map(const std::string &filename)
 	{
-		load();
+		load(filename);
 	}
 
 private:
