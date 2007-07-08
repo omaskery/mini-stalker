@@ -3,31 +3,31 @@
 = To-Do list =
 
 = Map Editor =
-  Safe Zones - priority 2
-  Entity Placement - priority 3
-   Images (aesthetic)        -3b
-   Objects (blocking)        -3e
-   Spawns                    -3d
-   'Lights'                  -3c
-  Item Placement (interactive)
-  Tile Editing  - priority 1a
-   Change Tile Image     - 1b
-   Manage 'Tile Palette' - 1c
-    First section of the map file details associations between tile numbers and tile images
-    e.g: 0:"ground.bmp", 1:"grass.bmp", 2:"etc.bmp", ...
+  # Safe Zones - priority 2
+  # Entity Placement - priority 3
+    * Images (aesthetic)        -3b
+    * Objects (blocking)        -3e
+    * Spawns                    -3d
+    * 'Lights'                  -3c
+  # Item Placement (interactive)
+  # Tile Editing  - priority 1a
+    * Change Tile Image     - 1b
+    * Manage 'Tile Palette' - 1c
+      * First section of the map file details associations between tile numbers and tile images
+      * e.g: 0:"ground.bmp", 1:"grass.bmp", 2:"etc.bmp", ...
   
 = Main Game =
 
-  Configure Window
-  Map System
-   Load Map
-   Draw Map
-   Interact with Map
-  Item System
-   "Global" item system, aka, objects dropped on the floor
-   Make neat method for interaction between item systems to make trading easier later
-  Player System
-   Make a character that spawns in the map
-   Give the player an inventory
+  # Configure Window
+  # Map System
+    * Load Map
+    * Draw Map
+    * Interact with Map
+  # Item System
+    * "Global" item system, aka, objects dropped on the floor
+    * Make neat method for interaction between item systems to make trading easier later
+  # Player System
+    * Make a character that spawns in the map
+    * Give the player an inventory
 
 ...and more, but lets not get ahead of ourselves. hah.
