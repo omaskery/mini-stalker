@@ -1,0 +1,101 @@
+#summary Simple documentation of the map file structure
+
+= Map Structure Overview =
+
+  * Width & Height
+  * Tile Palette
+  * Tile List
+  * Safe Zones
+  * Bounding-Box Collision Zones
+  * Entity IDs & Positions
+  * Lights
+
+== Width & Height ==
+
+Essentially this is just two values:
+
+{{{
+width,height\n
+}}}
+
+== Tile Palette ==
+
+This section maps ID numbers to bitmap file name in the format of "TileNumber:BitmapFile.bmp", however, before this list there must be a number detailing the number of items in the list:
+
+{{{
+3
+0:"grass.bmp"\n
+1:"concrete.bmp"\n
+2:"wall.bmp"\n
+}}}
+
+== Tile List ==
+
+This section builds upon the Tile Palette, it just lists the tile ID's for each tile. In my map editor I intend to output the list in rows, creating a sort of table representing the actual map. This won't affect the map reading/writing in any way, it's partly aesthetic but it also helps identify what area of the map file you're looking at - and should allow (if you're insane) hand editing of files that for some reason you aren't using the editor for.
+
+To know how many values you're reading, you should just be able to multiply the map's width * height, the resulting number is the number of tiles you need to read.
+
+{{{
+0,0,0,0,1,1,0,1,0,2,2,1,2,2,
+1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+1,1,1,1,1,2,2,2,2,2,2,2,0,0,
+1,1,1,1,1,0,0,0,0,0,0,2,0,0,
+...
+}}}
+
+== Safe Zones ==
+
+A safe zone is somewhere where, if blow-outs are implemented, you will be safe from the blowout. It may, i'm not sure yet, improve health recovery rates etc. These will be listed in the file simply as x,y,w,h.
+
+The number of safe zones present in the map must be placed before the list.
+
+{{{
+2
+0,0,100,200
+100,2,400,100
+}}}
+
+== Bounding-Box Collision Zones ==
+
+These are essentially going to be stored in an identical way to the Safe Zones, they are identical pieces of information. However, this data specifies where the player is prohibited from going on the map. For example, just because a section of the map has wall tiles doesn't mean the player can't just walk through it, tils are just graphical. In order to prevent a player walking through a wall, you place a bounding box around it.
+
+Again, the number of bounding-boxes in the map must be placed before the list:
+
+{{{
+4
+100,20,100,400
+120,102,103,10
+120,0,0,1
+1,123,12,3
+}}}
+
+== Entity IDs and Positions ==
+
+In this map format, an "Entity" refers to spawns, foreground images that don't collide with entities and images that DO collide with entities (However those would probably be rare, or even removed since I can't see how they'd be any more useful than bb-collision zones)
+
+An entity has a position (x,y) and an ID number. This ID number allows it to be identified within the program without specifically saying what the object is. This makes the entity system more flexible in that, in one game the entity 0 could be a player spawn, whilst in game 2 entity 0 could refer to a map trigger entity.
+
+The list will be in the form of ID:x,y\n where the list is prefixed with the number of entities in the map.
+
+{{{
+4
+0:10,10
+0:100,20
+2:10,200
+1:14,29
+}}}
+
+== Lights ==
+
+Lights in this game are sort of, cheating. 2D doesn't lend itself well to lighting effects, i'm also discouraged from trying to implement this in SDL either because of lag. However, i'm hoping that using clipping and sensible placement of lights around the map chances are that you won't see more than 2 lights on screen at any one time with a maximum radius of about 50.
+
+Lights will be implemented as circles that alpha blend outwards from the centre, being strongest in the centre and fading to alpha 0 at the edges. How successful this will be, and how detrimental to the frame rate it will be, I don't know. Time will tell, methinks.
+
+Lights will use the following values: x,y, r,g,b, radius. Self explanatory I think. Again, due to my method of loading files the list will be prefixed with the number of lights in the map.
+
+{{{
+2
+400,300,255,255,0,10
+800,1000,255,255,128,50
+}}}
