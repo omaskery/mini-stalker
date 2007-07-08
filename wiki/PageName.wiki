@@ -3,18 +3,19 @@
 = To-Do list =
 
 = Map Editor =
-  # Safe Zones - priority 2
-  # Entity Placement - priority 3
-    * Images (aesthetic)        -3b
-    * Objects (blocking)        -3e
-    * Spawns                    -3d
-    * 'Lights'                  -3c
-  # Item Placement (interactive)
-  # Tile Editing  - priority 1a
-    * Change Tile Image     - 1b
-    * Manage 'Tile Palette' - 1c
+
+  # Tile Editing
+    * Change Tile Image
+    * Manage 'Tile Palette'
       * First section of the map file details associations between tile numbers and tile images
       * e.g: 0:"ground.bmp", 1:"grass.bmp", 2:"etc.bmp", ...
+  # Safe Zones
+  # Entity Placement
+    * Images (aesthetic)
+    * 'Lights'
+    * Spawns
+    * Objects (blocking)
+  # Item Placement (interactive)
   
 = Main Game =
 
