@@ -24,6 +24,14 @@ struct entity
 	int x,y, ID;
 };
 
+int toNumber(const std::string &str)
+{
+	std::stringstream convert(str);
+	int ret;
+	convert >> ret;
+	return ret;
+}
+
 struct map
 {
 	std::vector<area> blocking;
@@ -32,14 +40,11 @@ struct map
 	std::vector<tile> tiles;
 	std::vector<area> safe;
 	int width, height;
+};
 
-	map(const std::string &filename)
-	{
-		load(filename);
-	}
-
-private:
-	void load(const std::string &filename)
-	{
-	}
+class MapSystem
+{
+	std::vector<tile_sprite> tiles;
+	map current;
+public:
 };
