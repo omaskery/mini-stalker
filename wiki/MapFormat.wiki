@@ -33,7 +33,7 @@ This section maps ID numbers to bitmap file name in the format of "TileNumber:Bi
 
 This section builds upon the Tile Palette, it just lists the tile ID's for each tile. In my map editor I intend to output the list in rows, creating a sort of table representing the actual map. This won't affect the map reading/writing in any way, it's partly aesthetic but it also helps identify what area of the map file you're looking at - and should allow (if you're insane) hand editing of files that for some reason you aren't using the editor for.
 
-To know how many values you're reading, you should just be able to multiply the map's width * height, the resulting number is the number of tiles you need to read.
+To know how many values you're reading, you should just be able to multiply the map's `width * height`, the resulting number is the number of tiles you need to read.
 
 {{{
 0,0,0,0,1,1,0,1,0,2,2,1,2,2,
