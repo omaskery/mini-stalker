@@ -7,6 +7,10 @@ int main()
 	SDL_Event e;
 	int run = 1;
 
+	MapSystem msys;
+
+	msys.Load("test.txt");
+
 	while(run)
 	{
 		while(engine.PollEvent(&e))
