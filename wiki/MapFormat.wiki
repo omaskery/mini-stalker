@@ -36,11 +36,11 @@ This section builds upon the Tile Palette, it just lists the tile ID's for each 
 To know how many values you're reading, you should just be able to multiply the map's `width * height`, the resulting number is the number of tiles you need to read.
 
 {{{
-0,0,0,0,1,1,0,1,0,2,2,1,2,2,
-1,1,1,1,1,1,0,0,0,0,0,0,0,0,
-1,1,1,1,1,1,0,0,0,0,0,0,0,0,
-1,1,1,1,1,2,2,2,2,2,2,2,0,0,
-1,1,1,1,1,0,0,0,0,0,0,2,0,0,
+0 0 0 0 1 1 0 1 0 2 2 1 2 2 
+1 1 1 1 1 1 0 0 0 0 0 0 0 0 
+1 1 1 1 1 1 0 0 0 0 0 0 0 0 
+1 1 1 1 1 2 2 2 2 2 2 2 0 0 
+1 1 1 1 1 0 0 0 0 0 0 2 0 0 
 ...
 }}}
 
