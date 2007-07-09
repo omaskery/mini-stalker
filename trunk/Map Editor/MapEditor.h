@@ -50,24 +50,17 @@ class MapSystem
 {
 	std::vector<tile_sprite> tiles;
 	map current;
-public:
-	void Load(const std::string &filename)
+	void load_wh(std::ifstream &f)
 	{
-		std::ifstream f(filename.c_str());
-		if(!f)
-		{
-			printf("Failed to open file\n");
-			return;
-		}
-
 		std::string buffer;
 		std::getline(f,buffer,',');
 		current.width = toNumber(buffer);
 		std::getline(f,buffer);
 		current.height = toNumber(buffer);
-
-		printf("width:%i,height:%i\n",current.width,current.height);
-
+	}
+	void load_palette(std::ifstream &f)
+	{
+		std::string buffer;
 		int paletteCount;
 		f >> paletteCount;
 		f.ignore();
@@ -83,21 +76,23 @@ public:
 			
 			tiles.push_back(temp);
 		}
-
-		printf("tile palette size:%i",tiles.size());
-
+	}
+	void load_tiles(std::ifstream &f)
+	{
 		int tileCount = current.width * current.height;
 
-		for(int i = 0; i < paletteCount; ++i)
+		for(int i = 0; i < tileCount; ++i)
 		{
 			tile temp;
 			f >> temp.tile_number;
 			current.tiles.push_back(temp);
 		}
 
-		printf("tile count:%i",current.tiles.size());
-
 		f.ignore();
+	}
+	void load_safe(std::ifstream &f)
+	{
+		std::string buffer;
 
 		int safeZones;
 		f >> safeZones;
@@ -117,8 +112,10 @@ public:
 
 			current.safe.push_back(temp);
 		}
-
-		printf("safe zones:%i",current.safe.size());
+	}
+	void load_block(std::ifstream &f)
+	{
+		std::string buffer;
 
 		int bbZones;
 		f >> bbZones;
@@ -138,8 +135,10 @@ public:
 
 			current.blocking.push_back(temp);
 		}
-
-		printf("block zones:%i",current.blocking.size());
+	}
+	void load_ents(std::ifstream &f)
+	{
+		std::string buffer;
 
 		int entities;
 		f >> entities;
@@ -155,8 +154,10 @@ public:
 			std::getline(f,buffer);
 			temp.y = toNumber(buffer);
 		}
-
-		printf("entities:%i",current.ents.size());
+	}
+	void load_lights(std::ifstream &f)
+	{
+		std::string buffer;
 
 		int lights;
 		f >> lights;
@@ -180,8 +181,31 @@ public:
 
 			current.lights.push_back(temp);
 		}
+	}
+public:
+	void Load(const std::string &filename)
+	{
+		std::ifstream f(filename.c_str());
+		if(!f)
+		{
+			printf("Failed to open file\n");
+			return;
+		}
 
-		printf("width: %i height: %i palette_count: %i tiles: %i safe_zones %i block_zones %i entities: %i lights: %i",current.width,current.height,paletteCount,current.tiles.size(),current.safe.size(),current.blocking.size(),current.ents.size(),current.lights.size());
+		load_wh(f);
+		printf("width:%i,height:%i\n",current.width,current.height);
+		load_palette(f);
+		printf("tile palette size:%i",tiles.size());
+		load_tiles(f);
+		printf("tile count:%i",current.tiles.size());
+		load_safe(f);
+		printf("safe zones:%i",current.safe.size());
+		load_block(f);
+		printf("block zones:%i",current.blocking.size());
+		load_ents(f);
+		printf("entities:%i",current.ents.size());
+		load_lights(f);
+		printf("width: %i height: %i palette_count: %i tiles: %i safe_zones %i block_zones %i entities: %i lights: %i",current.width,current.height,tiles.size(),current.tiles.size(),current.safe.size(),current.blocking.size(),current.ents.size(),current.lights.size());
 
 		f.close();
 	}
