@@ -16,21 +16,18 @@ struct Colour
 class Bitmap
 {
 	SDL_Surface *bmp;
+	bool lock;
 public:
-	Bitmap(const std::string &filename)
+	Bitmap() : lock(0)
 	{
-		SDL_Surface *temp = SDL_LoadBMP(filename.c_str());
-
-		if(!bmp)
-		{
-			fprintf(stderr,"Unable to load bitmap: %s\n",SDL_GetError());
-		}
-
-		bmp = SDL_DisplayFormat(temp);
+	}
+	Bitmap(const std::string &filename) : lock(0)
+	{
+		Load(filename);
 	}
 	~Bitmap()
 	{
-		SDL_FreeSurface(bmp);
+		if(lock) SDL_FreeSurface(bmp);
 	}
 	void SetMask(const Colour &C)
 	{
@@ -51,6 +48,24 @@ public:
 		dest.h = bmp->h;
 
 		SDL_BlitSurface(bmp,&src,screen,&dest);
+	}
+	void Load(const std::string &filename)
+	{
+		if(lock) return;
+
+		SDL_Surface *temp = SDL_LoadBMP(filename.c_str());
+
+		if(!bmp)
+		{
+			fprintf(stderr,"Unable to load bitmap: %s\n",SDL_GetError());
+			return;
+		}
+
+		bmp = SDL_DisplayFormat(temp);
+
+		printf("loaded %s\n",filename.c_str());
+
+		lock = true;
 	}
 };
 
@@ -120,6 +135,8 @@ Uint32 PixelAt(SDL_Surface *surface, int x, int y)
 
 void Pixel(SDL_Surface *surface, int x, int y, const Colour &C)
 {
+	if(x < 0 || y < 0 || x >= surface->w || y >= surface->h) return;
+
 	Uint32 source = SDL_MapRGB(surface->format,C.r,C.g,C.b);
 
 	Uint32 *dest = (Uint32*) surface->pixels + y*surface->w + x;
