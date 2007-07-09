@@ -24,9 +24,9 @@ This section maps ID numbers to bitmap file name in the format of "TileNumber:Bi
 
 {{{
 3
-0:"grass.bmp"\n
-1:"concrete.bmp"\n
-2:"wall.bmp"\n
+0:grass.bmp\n
+1:concrete.bmp\n
+2:wall.bmp\n
 }}}
 
 == Tile List ==
