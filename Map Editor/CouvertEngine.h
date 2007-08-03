@@ -1,3 +1,6 @@
+#ifndef COUVERT_ENGINE_H
+#define COUVERT_ENGINE_H
+
 #include <cstdlib>
 #include <SDL.h>
 #include <string>
@@ -67,6 +70,9 @@ public:
 
 		lock = true;
 	}
+	void Clear()
+	{
+	}
 };
 
 class Couvert
@@ -74,6 +80,7 @@ class Couvert
 	SDL_Surface *screen;
 	Uint8 *keys;
 	bool quit;
+	Uint32 black;
 public:
 	Couvert(const std::string &window_title, int width, int height, int flags = SDL_DOUBLEBUF) : quit(false)
 	{
@@ -91,6 +98,7 @@ public:
 
 		keys = SDL_GetKeyState(NULL);
 		SDL_WM_SetCaption(window_title.c_str(),window_title.c_str());
+		black = SDL_MapRGB(screen->format,0,0,0);
 	}
 	int PollEvent(SDL_Event *e)
 	{
@@ -119,6 +127,14 @@ public:
 	SDL_Surface *Screen()
 	{
 		return screen;
+	}
+	void Clear()
+	{
+		SDL_FillRect(screen,NULL,black);
+	}
+	void Clear(Uint32 colour)
+	{
+		SDL_FillRect(screen,NULL,colour);
 	}
 	~Couvert()
 	{
@@ -159,3 +175,5 @@ void Pixel(SDL_Surface *surface, int x, int y, const Colour &C)
 		 (BMask & (((source & BMask) * alpha +
 		(*dest & BMask) * ialpha) >>8));
 }
+
+#endif

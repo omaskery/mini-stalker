@@ -5,6 +5,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mini_STALKER", "Mini_STALKE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Map_Editor", "Map Editor\Map Editor.vcproj", "{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "map_template_generator", "map_template_generator\map_template_generator.vcproj", "{401DB606-ED68-4224-8BF3-5A9F4A368B20}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "map_sprite_adder", "map_sprite_adder\map_sprite_adder.vcproj", "{68ED46B9-BC1F-4C01-9422-6DC45467CFE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +23,14 @@ Global
 		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Debug|Win32.Build.0 = Debug|Win32
 		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Release|Win32.ActiveCfg = Release|Win32
 		{4948A7D6-97F2-4656-B7EA-50BCB370F6E2}.Release|Win32.Build.0 = Release|Win32
+		{401DB606-ED68-4224-8BF3-5A9F4A368B20}.Debug|Win32.ActiveCfg = Debug|Win32
+		{401DB606-ED68-4224-8BF3-5A9F4A368B20}.Debug|Win32.Build.0 = Debug|Win32
+		{401DB606-ED68-4224-8BF3-5A9F4A368B20}.Release|Win32.ActiveCfg = Release|Win32
+		{401DB606-ED68-4224-8BF3-5A9F4A368B20}.Release|Win32.Build.0 = Release|Win32
+		{68ED46B9-BC1F-4C01-9422-6DC45467CFE8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68ED46B9-BC1F-4C01-9422-6DC45467CFE8}.Debug|Win32.Build.0 = Debug|Win32
+		{68ED46B9-BC1F-4C01-9422-6DC45467CFE8}.Release|Win32.ActiveCfg = Release|Win32
+		{68ED46B9-BC1F-4C01-9422-6DC45467CFE8}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

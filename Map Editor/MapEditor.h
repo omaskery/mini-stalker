@@ -1,315 +1,538 @@
-struct tile
+#include "MapSystem.h"
+
+enum tool_mode_enum
 {
-	int tile_number;
+	SAFE_ZONE = 1,
+	BOUND_ZONE,
+	TILE_EDIT,
+	PLACE_ENT,
 };
 
-struct tile_sprite
+struct textbox
 {
-	Bitmap bmp;
-	int ID;
-
-	tile_sprite(int ID) : ID(0)
-	{
-		printf("ID: %i\n",ID);
-	}
-	tile_sprite(const std::string &str, int ID) : bmp(str), ID(ID)
+	std::string text;
+	bool active;
+	
+	textbox(const std::string &t = "") : text(t), active(0)
 	{
 	}
 };
 
-struct area
+struct camera
 {
-	int x,y,w,h;
+	float x,y,mx,my;
+
+	camera() : x(0),y(0),mx(0),my(0)
+	{
+	}
+	camera(float X, float Y) : x(X), y(Y), mx(0), my(0)
+	{
+	}
 };
 
-struct light
+class MapEditor
 {
-	int x,y, r,g,b, radius;
-};
+	SDL_Surface *safe_hud, *bound_hud, *tile_hud, *ent_hud;
+	areas *safe, *bound;
+	MapSystem map_system;
+	SDL_Surface *dest;
+	float speed;
+	config conf;
+	camera cam;
+	Text text;
 
-struct entity
-{
-	int x,y, ID;
-};
+	int w,h, mouse_x,mouse_y,mouse_p_button,mouse_button, tool_mode;
 
-int toNumber(const std::string &str)
-{
-	std::stringstream convert(str);
-	int ret;
-	convert >> ret;
-	return ret;
-}
+	int x1,y1,x2,y2;
+	int tile_kind;
+	SDL_Surface *current_tile;
+	SDL_Rect c_tile_rect;
+	textbox dataA,dataB;
+	
+	bool active, shift, space;
 
-struct map
-{
-	std::vector<area> blocking;
-	std::vector<light> lights;
-	std::vector<entity> ents;
-	std::vector<tile> tiles;
-	std::vector<area> safe;
-	int width, height;
-};
-
-class MapSystem
-{
-	std::vector<tile_sprite> tiles;
-	map current;
-	void load_wh(std::ifstream &f)
+	void safe_zone()
 	{
-		std::string buffer;
-		std::getline(f,buffer,',');
-		current.width = toNumber(buffer);
-		std::getline(f,buffer);
-		current.height = toNumber(buffer);
-	}
-	void load_palette(std::ifstream &f)
-	{
-		std::string buffer;
-		int paletteCount;
-		f >> paletteCount;
-		f.ignore();
-
-		for(int i = 0; i < paletteCount; ++i)
+		if(space)
 		{
-			int ID;
-			std::getline(f,buffer,':');
-			ID = toNumber(buffer);
-			std::getline(f,buffer);
-			tile_sprite temp(ID);
-			
-			tiles.push_back(temp);
-			tiles.back().bmp.Load(buffer);
-
-			printf("associated %i with %s\n",ID,buffer.c_str());
-			buffer = "";
 		}
-	}
-	void load_tiles(std::ifstream &f)
-	{
-		int tileCount = current.width * current.height;
-
-		for(int i = 0; i < tileCount; ++i)
+		else if(mouse_button == SDL_BUTTON_RIGHT)
 		{
-			tile temp;
-			f >> temp.tile_number;
-			current.tiles.push_back(temp);
-		}
-
-		f.ignore();
-	}
-	void load_safe(std::ifstream &f)
-	{
-		std::string buffer;
-
-		int safeZones;
-		f >> safeZones;
-		f.ignore();
-
-		for(int i = 0; i < safeZones; ++i)
-		{
-			area temp;
-			std::getline(f,buffer,',');
-			temp.x = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.y = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.w = toNumber(buffer);
-			std::getline(f,buffer);
-			temp.h = toNumber(buffer);
-
-			current.safe.push_back(temp);
-		}
-	}
-	void load_block(std::ifstream &f)
-	{
-		std::string buffer;
-
-		int bbZones;
-		f >> bbZones;
-		f.ignore();
-
-		for(int i = 0; i < bbZones; ++i)
-		{
-			area temp;
-			std::getline(f,buffer,',');
-			temp.x = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.y = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.w = toNumber(buffer);
-			std::getline(f,buffer);
-			temp.h = toNumber(buffer);
-
-			current.blocking.push_back(temp);
-		}
-	}
-	void load_ents(std::ifstream &f)
-	{
-		std::string buffer;
-
-		int entities;
-		f >> entities;
-		f.ignore();
-		
-		for(int i = 0; i < entities; ++i)
-		{
-			entity temp;
-			std::getline(f,buffer,':');
-			temp.ID = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.x = toNumber(buffer);
-			std::getline(f,buffer);
-			temp.y = toNumber(buffer);
-
-			current.ents.push_back(temp);
-		}
-	}
-	void load_lights(std::ifstream &f)
-	{
-		std::string buffer;
-
-		int lights;
-		f >> lights;
-		f.ignore();
-
-		for(int i = 0; i < lights; ++i)
-		{
-			light temp;
-			std::getline(f,buffer,',');
-			temp.x = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.y = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.r = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.g = toNumber(buffer);
-			std::getline(f,buffer,',');
-			temp.b = toNumber(buffer);
-			std::getline(f,buffer);
-			temp.radius = toNumber(buffer);
-
-			current.lights.push_back(temp);
-		}
-	}
-	void start_mapXY(int &x, int &y, int cx, int cy)
-	{
-		for(int Y = 0; Y < current.height; ++Y)
-		{
-			if(cy >= (Y*32) && cy <= (Y*32)+32)
+			std::vector<area>::iterator iter = safe->a.begin();
+			while(iter != safe->a.end())
 			{
-				for(int X = 0; X < current.width; ++X)
+				if(mouse_x >= iter->x-cam.x && mouse_x <= iter->x+iter->w-cam.x && mouse_y >= iter->y-cam.y && mouse_y <= iter->y+iter->h-cam.y)
 				{
-					if(cx >= (X*32) && cx <= (X*32)+32)
-					{
-						x = X;
-						y = Y;
-						return;
-					}
+					safe->a.erase(iter);
+					break;
+				}
+
+				if(iter != safe->a.end()) ++iter;
+			}
+		}
+		else if(mouse_button == SDL_BUTTON_LEFT)
+		{
+			if(x1 == -1)
+			{
+				x1 = mouse_x;
+				y1 = mouse_y;
+			}
+			else
+			{
+				SDL_Rect toMouse;
+				toMouse.x = std::min(mouse_x,x1);
+				toMouse.y = std::min(mouse_y,y1);
+				toMouse.w = std::max(mouse_x,x1) - std::min(mouse_x,x1);
+				toMouse.h = std::max(mouse_y,y1) - std::min(mouse_y,y1);
+
+				SDL_FillRect(dest,&toMouse,SDL_MapRGB(dest->format,0,255,0));
+			}
+		}
+		else
+		{
+			if(x1 != -1)
+			{
+				x2 = mouse_x;
+				y2 = mouse_y;
+
+				area new_safe;
+				new_safe.x = std::min(x1,x2) + cam.x;
+				new_safe.y = std::min(y1,y2) + cam.y;
+				new_safe.w = std::max(x1,x2) - std::min(x1,x2);
+				new_safe.h = std::max(y1,y2) - std::min(y1,y2);
+
+				safe->a.push_back(new_safe);
+
+				x1 = -1;
+			}
+		}
+
+		for(unsigned int i = 0; i < safe->a.size(); ++i)
+		{
+			area &a = safe->a[i];
+
+			if(a.x+a.w-cam.x < 0 || a.y+a.h-cam.y < 0 || a.x-cam.x >= dest->w || a.y-cam.y >= dest->h) continue;
+
+			for(int y = a.y-(int)cam.y; y < a.y + a.h - (int)cam.y; ++y)
+			{
+				if(y > dest->h) break;
+				if(y < 0) continue;
+
+				for(int x = a.x - (int)cam.x; x < a.x + a.w - (int)cam.x; ++x)
+				{
+					if(x > dest->w) break;
+					if(x < 0) continue;
+
+					Pixel(dest,x,y,Colour(0,255,0,128));
 				}
 			}
 		}
+
+		SDL_BlitSurface(safe_hud,NULL,dest,NULL);
 	}
-	void draw_tile(SDL_Surface *dest, int ID, int x, int y)
+	void bound_zone()
 	{
-		for(unsigned int i = 0; i < tiles.size(); ++i)
+		if(space)
 		{
-			if(tiles[i].ID == ID)
+		}
+		else if(mouse_button == SDL_BUTTON_RIGHT)
+		{
+			std::vector<area>::iterator iter = bound->a.begin();
+			while(iter != bound->a.end())
 			{
-				tiles[i].bmp.Draw(dest,x,y);
-				return;
+				if(mouse_x >= iter->x-cam.x && mouse_x <= iter->x+iter->w-cam.x && mouse_y >= iter->y-cam.y && mouse_y <= iter->y+iter->h-cam.y)
+				{
+					bound->a.erase(iter);
+					break;
+				}
+
+				if(iter != bound->a.end()) ++iter;
 			}
 		}
-	}
-	void draw_safe(SDL_Surface *dest, int cx, int cy)
-	{
-		for(unsigned int i = 0; i < current.safe.size(); ++i)
+		else if(mouse_button == SDL_BUTTON_LEFT)
 		{
-			area &a = current.safe[i];
-
-			for(int y = a.y; y < a.y+a.h; ++y)
+			if(x1 == -1)
 			{
-				for(int x = a.x; x < a.x+a.w; ++x)
+				x1 = mouse_x;
+				y1 = mouse_y;
+			}
+			else
+			{
+				SDL_Rect toMouse;
+				toMouse.x = std::min(mouse_x,x1);
+				toMouse.y = std::min(mouse_y,y1);
+				toMouse.w = std::max(mouse_x,x1) - std::min(mouse_x,x1);
+				toMouse.h = std::max(mouse_y,y1) - std::min(mouse_y,y1);
+
+				SDL_FillRect(dest,&toMouse,SDL_MapRGB(dest->format,255,0,0));
+			}
+		}
+		else
+		{
+			if(x1 != -1)
+			{
+				x2 = mouse_x;
+				y2 = mouse_y;
+
+				area new_bound;
+				new_bound.x = std::min(x1,x2) + cam.x;
+				new_bound.y = std::min(y1,y2) + cam.y;
+				new_bound.w = std::max(x1,x2) - std::min(x1,x2);
+				new_bound.h = std::max(y1,y2) - std::min(y1,y2);
+
+				bound->a.push_back(new_bound);
+
+				x1 = -1;
+			}
+		}
+
+		for(unsigned int i = 0; i < bound->a.size(); ++i)
+		{
+			area &a = bound->a[i];
+
+			if(a.x+a.w-(int)cam.x < 0 || a.y+a.h-(int)cam.y < 0 || a.x-(int)cam.x >= dest->w || a.y-(int)cam.y >= dest->h) continue;
+
+			for(int y = a.y-(int)cam.y; y < a.y + a.h - (int)cam.y; ++y)
+			{
+				if(y > dest->h) break;
+				if(y < 0) continue;
+
+				for(int x = a.x - (int)cam.x; x < a.x + a.w - (int)cam.x; ++x)
 				{
-					if(x == a.x || y == a.y || x == (a.x+a.w)-1 || y == (a.y+a.h)-1)
-					{
-						Pixel(dest,x-cx,y-cy,Colour(0,255,0,255));
-					}
-					else Pixel(dest,x-cx,y-cy,Colour(100,255,100,128));
+					if(x > dest->w) break;
+					if(x < 0) continue;
+					Pixel(dest,x,y,Colour(255,0,0,128));
 				}
 			}
 		}
-	}
-	void draw_block(SDL_Surface *dest, int cx, int cy)
-	{
-		for(unsigned int i = 0; i < current.blocking.size(); ++i)
-		{
-			area &a = current.blocking[i];
 
-			for(int y = a.y; y < a.y+a.h; ++y)
+		SDL_BlitSurface(bound_hud,NULL,dest,NULL);
+	}
+	void tile_edit()
+	{
+		int i_x = 0, i_y = 0;
+		int tx = mouse_x+cam.x, ty = mouse_y+cam.y;
+
+		if(space)
+		{
+			if(isPressed(183,5,34,34) && !mouse_p_button)
 			{
-				for(int x = a.x; x < a.x+a.w; ++x)
+				tile_kind = (tile_kind - 1) % (map_system.getMap()->sprites.size());
+				current_tile = NULL;
+			}
+			else if(isPressed(257,5,34,34) && !mouse_p_button)
+			{
+				tile_kind = (tile_kind + 1) % (map_system.getMap()->sprites.size());
+				current_tile = NULL;
+			}
+		}
+
+		while(tx - 32 > 0)
+		{
+			tx -= 32;
+			++i_x;
+		}
+		while(ty - 32 > 0)
+		{
+			ty -= 32;
+			++i_y;
+		}
+
+		if(!space && mouse_button == SDL_BUTTON_LEFT && (mouse_p_button == 0 || shift))
+		{
+			map_system.getMap()->tiles[i_y*w+i_x] = tile_kind;
+		}
+
+		i_x = i_x * 32 - cam.x;
+		i_y = i_y * 32 - cam.y;
+
+		for(int y = i_y; y < i_y+32; ++y)
+		{
+			for(int x = i_x; x < i_x+32; ++x)
+			{
+				Pixel(dest,x,y,Colour(255,0,0,128));
+			}
+		}
+
+		SDL_BlitSurface(tile_hud,NULL,dest,NULL);
+		//221,6
+
+		if(!current_tile)
+		{
+			for(unsigned int i = 0; i < map_system.getMap()->sprites.size(); ++i)
+			{
+				if(map_system.getMap()->sprites[i].ID == tile_kind)
 				{
-					if(x == a.x || y == a.y || x == (a.x+a.w)-1 || y == (a.y+a.h)-1)
-					{
-						Pixel(dest,x-cx,y-cy,Colour(255,0,255,255));
-					}
-					else Pixel(dest,x-cx,y-cy,Colour(255,100,255,128));
+					current_tile = map_system.getMap()->sprites[i].sprite;
+					break;
 				}
 			}
 		}
+
+		SDL_BlitSurface(current_tile,NULL,dest,&c_tile_rect);
 	}
-	void draw_lights(SDL_Surface *dest)
+	void place_ent()
 	{
+		std::vector<position> &pos = map_system.getMap()->pos;
+
+		if(space)
+		{
+		}
+		else if(mouse_button == SDL_BUTTON_RIGHT && !mouse_p_button)
+		{
+			std::vector<position>::iterator iter = map_system.getMap()->pos.begin();
+			while(iter != map_system.getMap()->pos.end())
+			{
+				if(mouse_x+cam.x >= iter->x-10 && mouse_x+cam.x <= iter->x+10 && mouse_y+cam.y >= iter->y-10 && mouse_y+cam.y <= iter->y+10)
+				{
+					map_system.getMap()->pos.erase(iter);
+					break;
+				}
+
+				if(iter != map_system.getMap()->pos.end()) ++iter;
+			}
+		}
+		else if(mouse_button == SDL_BUTTON_LEFT && !mouse_p_button)
+		{
+			position temp;
+
+			temp.x = mouse_x + cam.x;
+			temp.y = mouse_y + cam.y;
+			temp.dataA = toInt(dataA.text);
+			temp.dataB = toInt(dataB.text);
+
+			pos.push_back(temp);
+		}
+
+		for(unsigned int i = 0; i < pos.size(); ++i)
+		{
+			if(pos[i].x-cam.x < 0 || pos[i].x-cam.x >= dest->w || pos[i].y-cam.y < 0 || pos[i].y-cam.y >= dest->h) continue;
+
+			SDL_Rect ent;
+			ent.x = pos[i].x-cam.x-10;
+			ent.y = pos[i].y-cam.y-10;
+			ent.w = 20;
+			ent.h = 20;
+
+			SDL_FillRect(dest,&ent,SDL_MapRGB(dest->format,0,0,255));
+
+			text.draw(dest,ent.x-5,ent.y-10,toStr(pos[i].dataA));
+			text.draw(dest,ent.x-5,ent.y+5 ,toStr(pos[i].dataB));
+		}
+
+		SDL_BlitSurface(ent_hud,NULL,dest,NULL);
+		text.draw(dest,201,14,dataA.text);
+		text.draw(dest,339,14,dataB.text);
 	}
 public:
-	void Load(const std::string &filename)
+	MapEditor(SDL_Surface *d, float speed) : conf("config.txt"),text("my_font.bmp"),dataA("0"),dataB("0"),dest(d),w(0),h(0),space(0),active(0),current_tile(0),tile_kind(0),speed(speed),mouse_button(0),tool_mode(SAFE_ZONE), shift(0)
 	{
-		std::ifstream f(filename.c_str());
-		if(!f)
+		x1 = -1;
+		x2 = -1;
+		y1 = -1;
+		y2 = -1;
+
+		safe_hud = SDL_LoadBMP("safe_hud.bmp");
+		bound_hud = SDL_LoadBMP("bound_hud.bmp");
+		tile_hud = SDL_LoadBMP("tile_hud.bmp");
+		ent_hud = SDL_LoadBMP("ent_hud.bmp");
+
+		SDL_SetColorKey(safe_hud,SDL_SRCCOLORKEY|SDL_RLEACCEL,SDL_MapRGB(safe_hud->format,0,0,0));
+		SDL_SetColorKey(bound_hud,SDL_SRCCOLORKEY|SDL_RLEACCEL,SDL_MapRGB(bound_hud->format,0,0,0));
+		SDL_SetColorKey(tile_hud,SDL_SRCCOLORKEY|SDL_RLEACCEL,SDL_MapRGB(tile_hud->format,0,0,0));
+		SDL_SetColorKey(ent_hud,SDL_SRCCOLORKEY|SDL_RLEACCEL,SDL_MapRGB(ent_hud->format,0,0,0));
+
+		int alpha = 230;
+		SDL_SetAlpha(safe_hud,SDL_SRCALPHA|SDL_RLEACCEL,alpha);
+		SDL_SetAlpha(bound_hud,SDL_SRCALPHA|SDL_RLEACCEL,alpha);
+		SDL_SetAlpha(tile_hud,SDL_SRCALPHA|SDL_RLEACCEL,alpha);
+		SDL_SetAlpha(ent_hud,SDL_SRCALPHA|SDL_RLEACCEL,alpha);
+
+		c_tile_rect.x = 221;
+		c_tile_rect.y = 6;
+		c_tile_rect.w = 32;
+		c_tile_rect.h = 32;
+
+		conf.load();
+
+		conf.get_block("config")->get_block("defaults")->get_value("ent_dataA")->get(&dataA.text);
+		conf.get_block("config")->get_block("defaults")->get_value("ent_dataB")->get(&dataB.text);
+		conf.get_block("config")->get_block("settings")->get_value("scroll_speed")->get(&speed);
+
+		std::string conf_tool;
+		conf.get_block("config")->get_block("defaults")->get_value("tool")->get(&conf_tool);
+		if(conf_tool == "safe_zone") tool_mode = SAFE_ZONE;
+		else if(conf_tool == "bound_zone") tool_mode = BOUND_ZONE;
+		else if(conf_tool == "tile_edit") tool_mode = TILE_EDIT;
+		else if(conf_tool == "place_ent") tool_mode = PLACE_ENT;
+	}
+	~MapEditor()
+	{
+		SDL_FreeSurface(safe_hud);
+		SDL_FreeSurface(bound_hud);
+		SDL_FreeSurface(tile_hud);
+		SDL_FreeSurface(ent_hud);
+	}
+	config *getConfig()
+	{
+		return &conf;
+	}
+	int load(const std::string &filename)
+	{
+		if(map_system.load(filename)) return -1;
+
+		w = map_system.getMap()->w;
+		h = map_system.getMap()->h;
+		safe = map_system.getArea("safe");
+		bound = map_system.getArea("bound");
+		active = true;
+
+		return 0;
+	}
+	bool isActive()
+	{
+		return active;
+	}
+	void set_tool(int mode)
+	{
+		tool_mode = mode;
+	}
+	void save(const std::string &filename)
+	{
+		if(active) map_system.save(filename);
+	}
+	void handle_event(SDL_Event &e)
+	{
+		switch(e.type)
 		{
-			printf("Failed to open file\n");
+		case SDL_MOUSEBUTTONDOWN :
+			{
+				mouse_x = e.button.x;
+				mouse_y = e.button.y;
+				mouse_button = e.button.button;
+
+				if(space && tool_mode == PLACE_ENT)
+				{
+					if(isPressed(201,13,75,15)) dataA.active = true;
+					else dataA.active = false;
+					if(isPressed(339,13,75,15)) dataB.active = true;
+					else dataB.active = false;
+				}
+			} break;
+		case SDL_MOUSEBUTTONUP :
+			{
+				mouse_x = e.button.x;
+				mouse_y = e.button.y;
+				mouse_button = 0;
+			} break;
+		case SDL_KEYDOWN :
+			{
+				switch(e.key.keysym.sym)
+				{
+				case SDLK_UP :
+					{
+						cam.my = -speed;
+					} break;
+				case SDLK_DOWN :
+					{
+						cam.my = speed;
+					} break;
+				case SDLK_LEFT :
+					{
+						cam.mx = -speed;
+					} break;
+				case SDLK_RIGHT :
+					{
+						cam.mx = speed;
+					} break;
+				case SDLK_LSHIFT :
+				case SDLK_RSHIFT :
+					{
+						shift = true;
+					} break;
+				case SDLK_SPACE :
+					{
+						space = true;
+					} break;
+				case SDLK_BACKSPACE :
+					{
+						if(dataA.active && dataA.text.size()) dataA.text.erase(dataA.text.size()-1);
+						if(dataB.active && dataB.text.size()) dataB.text.erase(dataB.text.size()-1);
+					} break;
+				default:
+					{
+						if(tool_mode == PLACE_ENT)
+						{
+							if(e.key.keysym.unicode >= '0' && e.key.keysym.unicode <= '9' || e.key.keysym.unicode == '-')
+							{
+								if(dataA.active && dataA.text.size() < 8) dataA.text += e.key.keysym.unicode;
+								if(dataB.active && dataB.text.size() < 8) dataB.text += e.key.keysym.unicode;
+							}
+						}
+					} break;
+				}
+			} break;
+		case SDL_KEYUP :
+			{
+				switch(e.key.keysym.sym)
+				{
+				case SDLK_UP :
+				case SDLK_DOWN :
+					{
+						cam.my = 0;
+					} break;
+				case SDLK_LEFT :
+				case SDLK_RIGHT :
+					{
+						cam.mx = 0;
+					} break;
+				case SDLK_LSHIFT :
+				case SDLK_RSHIFT :
+					{
+						shift = false;
+					} break;
+				case SDLK_SPACE :
+					{
+						space = false;
+					} break;
+				}
+			} break;
+		}
+	}
+	void update()
+	{
+		cam.x += cam.mx;
+		cam.y += cam.my;
+
+		if(cam.x < 0) cam.x = 0;
+		if(cam.y < 0) cam.y = 0;
+		if(cam.x >= w*32-800) cam.x = (float)w*32-800;
+		if(cam.y >= h*32-600) cam.y = (float)h*32-600;
+
+		SDL_GetMouseState(&mouse_x,&mouse_y);
+		
+		switch(tool_mode)
+		{
+		case SAFE_ZONE : safe_zone(); break;
+		case BOUND_ZONE : bound_zone(); break;
+		case TILE_EDIT : tile_edit(); break;
+		case PLACE_ENT : place_ent(); break;
+		default:
+			printf("invalid tool.\n");
+		}
+		
+		mouse_p_button = mouse_button;
+	}
+	void render()
+	{
+		if(!active)
+		{
+			printf("cannot render, inactive.\n");
 			return;
 		}
+		
+		map_system.draw(dest,(int)cam.x,(int)cam.y);
 
-		tiles.clear();
-
-		load_wh(f);
-		printf("width:%i,height:%i\n",current.width,current.height);
-		load_palette(f);
-		printf("tile palette size:%i\n",tiles.size());
-		load_tiles(f);
-		printf("tile count:%i\n",current.tiles.size());
-		load_safe(f);
-		printf("safe zones:%i\n",current.safe.size());
-		load_block(f);
-		printf("block zones:%i\n",current.blocking.size());
-		load_ents(f);
-		printf("entities:%i\n",current.ents.size());
-		load_lights(f);
-		printf("lights:%i\n",current.lights.size());
-
-		f.close();
-	}
-	void Draw(SDL_Surface *dest, int view_x, int view_y)
-	{
-		int start_x, start_y;
-		start_mapXY(start_x,start_y,view_x,view_y);
-
-		for(int y = 0; y < 19; ++y)
-		{
-			if(y+start_y >= current.height) break;
-
-			for(int x = 0; x < 25; ++x)
-			{
-				if(x+start_x >= current.width) break;
-
-				int index = (y+start_y) * current.width + (x+start_x);
-				int ID = current.tiles[index].tile_number;
-				draw_tile(dest,ID,x*32-view_x,y*32-view_y);
-			}
-		}
-
-		draw_safe(dest,view_x,view_y);
-		draw_block(dest,view_x,view_y);
+		text.draw(dest,723,582,toStr(mouse_x+cam.x)+","+toStr(mouse_y+cam.y));
 	}
 };

@@ -127,6 +127,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="SDL.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -177,7 +178,47 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\animation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\camera.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CouvertEngine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\entity_enumeration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\functions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\includes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inventory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\light.h"
+				>
+			</File>
+			<File
+				RelativePath=".\map_renderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NPC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\player.h"
 				>
 			</File>
 		</Filter>
