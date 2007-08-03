@@ -1,5 +1,0 @@
-block "ids"
-{
-  0:map1.txt
-  1:map2.txt
-}
