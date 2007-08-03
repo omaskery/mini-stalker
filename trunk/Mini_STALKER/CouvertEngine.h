@@ -1,3 +1,6 @@
+#ifndef COUVERT_ENGINE_H
+#define COUVERT_ENGINE_H
+
 #include <cstdlib>
 #include <SDL.h>
 #include <string>
@@ -16,21 +19,18 @@ struct Colour
 class Bitmap
 {
 	SDL_Surface *bmp;
+	bool lock;
 public:
-	Bitmap(const std::string &filename)
+	Bitmap() : lock(0)
 	{
-		SDL_Surface *temp = SDL_LoadBMP(filename.c_str());
-
-		if(!bmp)
-		{
-			fprintf(stderr,"Unable to load bitmap: %s\n",SDL_GetError());
-		}
-
-		bmp = SDL_DisplayFormat(temp);
+	}
+	Bitmap(const std::string &filename) : lock(0)
+	{
+		Load(filename);
 	}
 	~Bitmap()
 	{
-		SDL_FreeSurface(bmp);
+		if(lock) SDL_FreeSurface(bmp);
 	}
 	void SetMask(const Colour &C)
 	{
@@ -52,6 +52,27 @@ public:
 
 		SDL_BlitSurface(bmp,&src,screen,&dest);
 	}
+	void Load(const std::string &filename)
+	{
+		if(lock) return;
+
+		SDL_Surface *temp = SDL_LoadBMP(filename.c_str());
+
+		if(!bmp)
+		{
+			fprintf(stderr,"Unable to load bitmap: %s\n",SDL_GetError());
+			return;
+		}
+
+		bmp = SDL_DisplayFormat(temp);
+
+		printf("loaded %s\n",filename.c_str());
+
+		lock = true;
+	}
+	void Clear()
+	{
+	}
 };
 
 class Couvert
@@ -59,6 +80,7 @@ class Couvert
 	SDL_Surface *screen;
 	Uint8 *keys;
 	bool quit;
+	Uint32 black;
 public:
 	Couvert(const std::string &window_title, int width, int height, int flags = SDL_DOUBLEBUF) : quit(false)
 	{
@@ -76,6 +98,7 @@ public:
 
 		keys = SDL_GetKeyState(NULL);
 		SDL_WM_SetCaption(window_title.c_str(),window_title.c_str());
+		black = SDL_MapRGB(screen->format,0,0,0);
 	}
 	int PollEvent(SDL_Event *e)
 	{
@@ -105,6 +128,14 @@ public:
 	{
 		return screen;
 	}
+	void Clear()
+	{
+		SDL_FillRect(screen,NULL,black);
+	}
+	void Clear(Uint32 colour)
+	{
+		SDL_FillRect(screen,NULL,colour);
+	}
 	~Couvert()
 	{
 		SDL_Quit();
@@ -120,6 +151,8 @@ Uint32 PixelAt(SDL_Surface *surface, int x, int y)
 
 void Pixel(SDL_Surface *surface, int x, int y, const Colour &C)
 {
+	if(x < 0 || y < 0 || x >= surface->w || y >= surface->h) return;
+
 	Uint32 source = SDL_MapRGB(surface->format,C.r,C.g,C.b);
 
 	Uint32 *dest = (Uint32*) surface->pixels + y*surface->w + x;
@@ -142,3 +175,5 @@ void Pixel(SDL_Surface *surface, int x, int y, const Colour &C)
 		 (BMask & (((source & BMask) * alpha +
 		(*dest & BMask) * ialpha) >>8));
 }
+
+#endif

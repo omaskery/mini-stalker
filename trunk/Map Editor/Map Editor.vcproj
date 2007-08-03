@@ -127,6 +127,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="SDL.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -185,7 +186,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\functions.h"
+				>
+			</File>
+			<File
 				RelativePath=".\includes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\light.h"
 				>
 			</File>
 			<File

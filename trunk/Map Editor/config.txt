@@ -1,0 +1,15 @@
+block "config"
+{
+  block "defaults"
+  {
+    tool:tile_edit
+    last:"save.txt"
+    ent_dataA:0
+    ent_dataB:0
+  }
+
+  block "settings"
+  {
+    scroll_speed:2.0
+  }
+}
