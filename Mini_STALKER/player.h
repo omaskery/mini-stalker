@@ -1,6 +1,6 @@
 struct player
 {
-	
+	animation ui,di,li,ri,uw,dw,lw,rw;
 	SDL_Rect rect;
 	float speed;
 	float x,y;
@@ -12,7 +12,7 @@ struct player
 
 	float mx,my; //used for button movement
 
-	player() : mx(0),my(0),anim_delay(clock())
+	player(const std::string &name) : ui("animations/mx(0),my(0),anim_delay(clock())
 	{
 		
 		if(!sprite) return;
