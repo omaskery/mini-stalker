@@ -2,33 +2,20 @@
 
 = To-Do list =
 
-= Map Editor =
-
-  # Tile Editing
-    * Change Tile Image
-    * Manage 'Tile Palette'
-      * First section of the map file details associations between tile numbers and tile images
-      * e.g: 0:"ground.bmp", 1:"grass.bmp", 2:"etc.bmp", ...
-  # Safe Zones
-  # Entity Placement
-    * Images (aesthetic)
-    * 'Lights'
-    * Spawns
-    * Objects (blocking)
-  # Item Placement (interactive)
+= Map Editor - Complete =
   
 = Main Game =
 
-  # Configure Window
-  # Map System
-    * Load Map
-    * Draw Map
-    * Interact with Map
-  # Item System
-    * "Global" item system, aka, objects dropped on the floor
-    * Make neat method for interaction between item systems to make trading easier later
-  # Player System
-    * Make a character that spawns in the map
-    * Give the player an inventory
+  # Represent the player in the game world in some asthetically pleasing manner (aka: finish hooking up the players drawing to animations that correspond to his actions)
+  # Make it possible to view the players inventory
+  # Put stashes on the map to use with testing
+  # Develop suitable interface for allowing items to be transfered to and from the stash from the players inventory
+  # Add static NPC's to the game (e.g traders like Siddrovich from the real game), make it possible to trade with them using a similar interface to the stash interface, tweaked to charge/give you money
+  # Add moving NPC's to the game such as mutants and various characters, NPC's will be given factions (Loners, Freedom, Duty, Bandits, Mutants, etc...),
+  # Implement attacking in the player and NPC's, all factions will have some kind of virtual "slider" dictating their attitude towards other factions - this will be used to decide how they will react to that faction. This slider will be used for everybody inside that faction, if the player is a Freedom member and shoots a duty member, Duty will start to dislike Freedom - regardless of who it is. If the Duty shoots a Freedom member as revenge, it doesn't have to be the player, then Duty will start to dislike Freedom - creating a loop.
+  # Implement some kind of missions system, these would be given by static NPC's who act as traders and mission providers. They would most suitably be placed deep within a town/compound so they don't get in situations where they have to interact with enemies - since they won't be programmed to interact with enemies.
 
-...and more, but lets not get ahead of ourselves. hah.
+= Notes =
+
+ * On the topic of world being populated with NPC's, it would be best if special entities were placed on the map that indicated a "spawn zone" or "control point". These places would be allocated to a specific faction, and would allow for NPC's of that faction to spawn there. This would then allow for enemy factions to attack a control/spawn point and if they kill all of the enemies there, it will become theirs. This of course brings about the issue of one faction dominating, with certain factions unable to spawn. In these times those factions will spawn on the edges of maps in groups - acting as "raiding parties" possibly. This could be implemented by adding another special entity to maps dictating where such "neutral" spawn points could be placed. Another important note is that Mutants will not use this system at all and will have their own spawn indicators.
+ * Other notes may follow...
