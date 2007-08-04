@@ -14,6 +14,7 @@
   # Add moving NPC's to the game such as mutants and various characters, NPC's will be given factions (Loners, Freedom, Duty, Bandits, Mutants, etc...),
   # Implement attacking in the player and NPC's, all factions will have some kind of virtual "slider" dictating their attitude towards other factions - this will be used to decide how they will react to that faction. This slider will be used for everybody inside that faction, if the player is a Freedom member and shoots a duty member, Duty will start to dislike Freedom - regardless of who it is. If the Duty shoots a Freedom member as revenge, it doesn't have to be the player, then Duty will start to dislike Freedom - creating a loop.
   # Implement some kind of missions system, these would be given by static NPC's who act as traders and mission providers. They would most suitably be placed deep within a town/compound so they don't get in situations where they have to interact with enemies - since they won't be programmed to interact with enemies.
+  # And more when these tasks are done...
 
 = Notes =
 
